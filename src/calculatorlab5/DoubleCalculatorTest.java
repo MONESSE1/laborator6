@@ -41,4 +41,5 @@ public class DoubleCalculatorTest {
         DoubleCalculator calc = new DoubleCalculator(0.0);
         assertThrows(IllegalArgumentException.class, () -> calc.init(123));
     }
+
 }
