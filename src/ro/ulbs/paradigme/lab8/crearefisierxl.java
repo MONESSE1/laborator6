@@ -1,8 +1,6 @@
 package ro.ulbs.paradigme.lab8;
 
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFCellStyle;
-import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.FileOutputStream;
@@ -15,7 +13,6 @@ public class crearefisierxl {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Grades");
 
-
         CellStyle headerStyle = workbook.createCellStyle();
         Font headerFont = workbook.createFont();
         headerFont.setBold(true);
@@ -23,10 +20,12 @@ public class crearefisierxl {
         headerStyle.setFillForegroundColor(IndexedColors.LIGHT_GREEN.getIndex());
         headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
-        CellStyle yellowStyle = workbook.createCellStyle();
-        yellowStyle.setFillForegroundColor(IndexedColors.LEMON_CHIFFON.getIndex());
-        yellowStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-
+        CellStyle yellowItalicStyle = workbook.createCellStyle();
+        Font italicFont = workbook.createFont();
+        italicFont.setItalic(true);
+        yellowItalicStyle.setFont(italicFont);
+        yellowItalicStyle.setFillForegroundColor(IndexedColors.LEMON_CHIFFON.getIndex());
+        yellowItalicStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
         String[] columns = {"Name", "Surname", "Grade 1", "Grade 2", "Grade 3", "Grade 4", "Max", "Average"};
         Row header = sheet.createRow(0);
@@ -35,7 +34,6 @@ public class crearefisierxl {
             cell.setCellValue(columns[i]);
             cell.setCellStyle(headerStyle);
         }
-
 
         Map<String, Object[]> data = new TreeMap<>();
         data.put("2", new Object[]{"Amit", "Shukla", 9, 8, 7, 5});
@@ -57,26 +55,44 @@ public class crearefisierxl {
                 }
             }
 
-
             String formulaMax = String.format("MAX(C%d:F%d)", rowNum + 1, rowNum + 1);
             Cell cellMax = row.createCell(6);
             cellMax.setCellFormula(formulaMax);
-            cellMax.setCellStyle(yellowStyle);
-
+            cellMax.setCellStyle(yellowItalicStyle);
 
             String formulaAvg = String.format("AVERAGE(C%d:F%d)", rowNum + 1, rowNum + 1);
             Cell cellAvg = row.createCell(7);
             cellAvg.setCellFormula(formulaAvg);
-            cellAvg.setCellStyle(yellowStyle);
+            cellAvg.setCellStyle(yellowItalicStyle);
 
             rowNum++;
         }
 
+        // rand medie
+        Row avgRow = sheet.createRow(rowNum);
+        Cell labelCell = avgRow.createCell(0);
+        labelCell.setCellStyle(headerStyle);
+
+        for (int col = 2; col <= 5; col++) { // Grade 1 - 4
+            char colLetter = (char) ('A' + col);
+            String formula = String.format("AVERAGE(%c2:%c%d)", colLetter, colLetter, rowNum);
+            Cell cell = avgRow.createCell(col);
+            cell.setCellFormula(formula);
+        }
+
+        String formulaMaxCol = String.format("AVERAGE(G2:G%d)", rowNum);
+        Cell cellMaxCol = avgRow.createCell(6);
+        cellMaxCol.setCellFormula(formulaMaxCol);
+        cellMaxCol.setCellStyle(yellowItalicStyle);
+
+        String formulaAvgCol = String.format("AVERAGE(H2:H%d)", rowNum);
+        Cell cellAvgCol = avgRow.createCell(7);
+        cellAvgCol.setCellFormula(formulaAvgCol);
+        cellAvgCol.setCellStyle(yellowItalicStyle);
 
         for (int i = 0; i < columns.length; i++) {
             sheet.autoSizeColumn(i);
         }
-
 
         try (FileOutputStream out = new FileOutputStream("grades.xlsx")) {
             workbook.write(out);
