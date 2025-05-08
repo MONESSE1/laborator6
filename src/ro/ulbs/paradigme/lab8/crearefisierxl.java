@@ -70,8 +70,7 @@ public class crearefisierxl {
 
         // rand medie
         Row avgRow = sheet.createRow(rowNum);
-        Cell labelCell = avgRow.createCell(0);
-        labelCell.setCellStyle(headerStyle);
+
 
         for (int col = 2; col <= 5; col++) { // Grade 1 - 4
             char colLetter = (char) ('A' + col);
